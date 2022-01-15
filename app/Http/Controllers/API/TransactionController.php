@@ -62,7 +62,6 @@ class TransactionController extends Controller
 
         foreach ($request->items as $product) {
             TransactionItem::create([
-                'users_id' => Auth::user()->id,
                 'products_id' => $product['id'],
                 'transactions_id' => $transaction->id,
                 'quantity' => $product['quantity']

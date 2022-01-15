@@ -6,14 +6,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class ProductCategory extends Model
+class MenuCategory extends Model
 {
     use HasFactory, SoftDeletes;
 
     protected $fillable = ['name'];
 
-    public function products()
+    public function menus()
     {
-        return $this->hasMany(Product::class, 'categories_id', 'id');
+        return $this->hasMany(Menu::class, 'categories_id', 'id');
     }
 }

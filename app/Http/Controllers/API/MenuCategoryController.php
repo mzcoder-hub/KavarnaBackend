@@ -4,10 +4,10 @@ namespace App\Http\Controllers\API;
 
 use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;
-use App\Models\ProductCategory;
+use App\Models\MenuCategory;
 use Illuminate\Http\Request;
 
-class ProductCategoryController extends Controller
+class MenuCategoryController extends Controller
 {
     public function all(Request $request)
     {
@@ -17,7 +17,7 @@ class ProductCategoryController extends Controller
         $show_category = $request->input('show_category');
 
         if ($id) {
-            $category = ProductCategory::with(['products'])->find($id);
+            $category = MenuCategory::with(['menus'])->find($id);
 
             if ($category) {
                 return ResponseFormatter::success($category, 'Data kategori berhasil diambil');
@@ -26,7 +26,7 @@ class ProductCategoryController extends Controller
             }
         }
 
-        $category = ProductCategory::query();
+        $category = MenuCategory::query();
 
 
         if ($name) {
@@ -34,7 +34,7 @@ class ProductCategoryController extends Controller
         }
 
         if ($show_category) {
-            $category->with('products');
+            $category->with('menus');
         }
 
         return ResponseFormatter::success($category->paginate($limit), 'Data List kategori berhasil diambil');

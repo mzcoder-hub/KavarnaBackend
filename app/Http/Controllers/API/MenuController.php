@@ -4,10 +4,10 @@ namespace App\Http\Controllers\API;
 
 use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;
-use App\Models\Product;
+use App\Models\Menu;
 use Illuminate\Http\Request;
 
-class ProductController extends Controller
+class MenuController extends Controller
 {
     public function all(Request $request)
     {
@@ -21,34 +21,34 @@ class ProductController extends Controller
         $price_to = $request->input('price_to');
 
         if ($id) {
-            $products = Product::with(['categories', 'galleries'])->find($id);
+            $menus = Menu::with(['categories', 'galleries'])->find($id);
 
-            if ($products) {
-                return ResponseFormatter::success($products, 'Data produk berhasil diambil');
+            if ($menus) {
+                return ResponseFormatter::success($menus, 'Data produk berhasil diambil');
             } else {
                 return ResponseFormatter::error(null, 'Produk tidak ditemukan', 404);
             }
         }
 
-        $products = Product::with(['categories', 'galleries']);
+        $menus = Menu::with(['categories', 'galleries']);
 
 
         if ($name) {
-            $products->where('name', 'like', '%' . $name . '%');
+            $menus->where('name', 'like', '%' . $name . '%');
         }
 
         if ($description) {
-            $products->where('description', 'like', '%' . $description . '%');
+            $menus->where('description', 'like', '%' . $description . '%');
         }
 
         if ($price_from && $price_to) {
-            $products->whereBetween('price', [$price_from, $price_to]);
+            $menus->whereBetween('price', [$price_from, $price_to]);
         }
 
         if ($categories) {
-            $products->where('category_id', $categories);
+            $menus->where('category_id', $categories);
         }
 
-        return ResponseFormatter::success($products->paginate($limit), 'Data produk berhasil diambil');
+        return ResponseFormatter::success($menus->paginate($limit), 'Data produk berhasil diambil');
     }
 }

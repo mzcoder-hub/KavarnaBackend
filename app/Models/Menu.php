@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Product extends Model
+class Menu extends Model
 {
     use HasFactory, SoftDeletes;
 
@@ -20,11 +20,11 @@ class Product extends Model
 
     public function categories()
     {
-        return $this->belongsTo(ProductCategory::class, 'categories_id', 'id');
+        return $this->belongsTo(MenuCategory::class, 'categories_id', 'id');
     }
 
     public function galleries()
     {
-        return $this->hasMany(ProductGallery::class, 'products_id', 'id');
+        return $this->hasMany(MenuGallery::class, 'menus_id', 'id');
     }
 }

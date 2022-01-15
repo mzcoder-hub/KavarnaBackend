@@ -7,12 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
 
-class ProductGallery extends Model
+class MenuGallery extends Model
 {
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'products_id',
+        'menus_id',
         'url',
     ];
 
