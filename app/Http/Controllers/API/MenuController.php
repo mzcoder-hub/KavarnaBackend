@@ -24,9 +24,9 @@ class MenuController extends Controller
             $menus = Menu::with(['categories', 'galleries'])->find($id);
 
             if ($menus) {
-                return ResponseFormatter::success($menus, 'Data produk berhasil diambil');
+                return ResponseFormatter::success($menus, 'Data menu berhasil diambil');
             } else {
-                return ResponseFormatter::error(null, 'Produk tidak ditemukan', 404);
+                return ResponseFormatter::error(null, 'Menu tidak ditemukan', 404);
             }
         }
 
@@ -46,9 +46,9 @@ class MenuController extends Controller
         }
 
         if ($categories) {
-            $menus->where('category_id', $categories);
+            $menus->where('categories_id', $categories);
         }
 
-        return ResponseFormatter::success($menus->paginate($limit), 'Data produk berhasil diambil');
+        return ResponseFormatter::success($menus->paginate($limit), 'Data menu berhasil diambil');
     }
 }

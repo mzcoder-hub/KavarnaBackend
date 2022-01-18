@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use Illuminate\Support\Facades\DB;
 use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;
 use App\Models\Transaction;
@@ -18,7 +19,7 @@ class TransactionController extends Controller
         $status = $request->input('status');
 
         if ($id) {
-            $transaction = Transaction::with(['items.product'])->find($id);
+            $transaction = Transaction::with(['items.menus'])->find($id);
 
             if ($transaction)
                 return ResponseFormatter::success(
@@ -33,7 +34,7 @@ class TransactionController extends Controller
                 );
         }
 
-        $transaction = Transaction::with(['items.product'])->where('users_id', Auth::user()->id);
+        $transaction = Transaction::with(['items.menus'])->where('users_id', Auth::user()->id);
 
         if ($status)
             $transaction->where('status', $status);
@@ -46,13 +47,15 @@ class TransactionController extends Controller
 
     public function checkout(Request $request)
     {
+	try{
         $request->validate([
             'items' => 'required|array',
-            'items.*.id' => 'exists:products,id',
+            'seat_number' => 'required',
+	    'items.*.id' => 'exists:menus,id',
             'total_price' => 'required',
-            'status' => 'required|in:PENDING,SUCCESS,CANCELLED,FAILED,SHIPPING,SHIPPED',
+            'status' => 'required',
         ]);
-
+//        return ResponseFormatter::success($request->items,'Transaksi Berhasil');
         $transaction = Transaction::create([
             'users_id' => Auth::user()->id,
             'seat_number' => $request->seat_number,
@@ -60,14 +63,21 @@ class TransactionController extends Controller
             'status' => $request->status
         ]);
 
-        foreach ($request->items as $product) {
+//        return ResponseFormatter::success($transaction->id, 'Transaction Success');
+
+        foreach ($request->items as $menu) {
             TransactionItem::create([
-                'products_id' => $product['id'],
-                'transactions_id' => $transaction->id,
-                'quantity' => $product['quantity']
+               'menus_id' => $menu['id'],
+               'transactions_id' => $transaction->id,
+               'quantity' => $menu['quantity']
             ]);
         }
 
-        return ResponseFormatter::success($transaction->load('items.product'), 'Transaksi berhasil');
+	DB::commit();
+        return ResponseFormatter::success($transaction, 'Transaksi berhasil');
+	}catch(Exception $e){
+        DB::rollback();
+        return ResponseFormatter::error($e, 'Transaksi Gagal');
+        }
     }
 }

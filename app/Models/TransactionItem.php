@@ -9,14 +9,16 @@ class TransactionItem extends Model
 {
     use HasFactory;
 
+    protected $table = 'transaction_items';
+
     protected $fillable = [
-        'product_id',
-        'transaction_id',
+        'menus_id',
+        'transactions_id',
         'quantity',
     ];
 
-    public function product()
+    public function menu()
     {
-        return $this->hasOne(Product::class, 'id', 'product_id');
+        return $this->hasOne(Menu::class, 'menus_id', 'id');
     }
 }
