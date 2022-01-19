@@ -10,7 +10,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Fortify\Rules\Password;
-use PhpParser\Node\Stmt\TryCatch;
 
 class UserController extends Controller
 {

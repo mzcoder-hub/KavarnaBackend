@@ -39,4 +39,17 @@ class MenuCategoryController extends Controller
 
         return ResponseFormatter::success($category->paginate($limit), 'Data List kategori berhasil diambil');
     }
+
+    public function update(Request $request)
+    {
+        $id = $request->input('id');
+
+        $menus = MenuCategory::find($id)->update($request->all());
+
+        if ($menus) {
+            return ResponseFormatter::success($menus, 'Data menu berhasil di update');
+        } else {
+            return ResponseFormatter::error(null, 'Menu tidak ditemukan', 404);
+        }
+    }
 }
