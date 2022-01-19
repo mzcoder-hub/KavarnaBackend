@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\API;
 
+use Illuminate\Support\Facades\DB;
 use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;
 use App\Models\MenuCategory;
 use Illuminate\Http\Request;
+use Exception;
 
 class MenuCategoryController extends Controller
 {
@@ -42,14 +44,17 @@ class MenuCategoryController extends Controller
 
     public function update(Request $request)
     {
-        $id = $request->input('id');
 
-        $menus = MenuCategory::find($id)->update($request->all());
+	//return ResponseFormatter::success($request->name, 'Data menu berhasil di update');
 
-        if ($menus) {
-            return ResponseFormatter::success($menus, 'Data menu berhasil di update');
-        } else {
-            return ResponseFormatter::error(null, 'Menu tidak ditemukan', 404);
-        }
+	try{
+           $menuCategoryUpdate =  MenuCategory::find($request->id)->update(['name' => $request->name]);
+            DB::commit();
+           return ResponseFormatter::success($menuCategoryUpdate, 'Data menu berhasil di update');
+	}catch(Exception $e){
+	    DB::rollback();
+            return ResponseFormatter::error($e, 'Menu tidak ditemukan', 404);
+	}
+
     }
 }
