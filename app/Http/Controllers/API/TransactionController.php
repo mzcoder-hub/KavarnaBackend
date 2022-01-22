@@ -15,24 +15,25 @@ class TransactionController extends Controller
 {
     public function all(Request $request)
     {
-        $id = $request->input('id');
-        $limit = $request->input('limit', 6);
-        $status = $request->input('status');
+        $id = $request->transaction_id;
+        $limit = $request->limit;
+        $status = $request->status;
 
         if ($id) {
             $transaction = Transaction::with(['items.menus'])->find($id);
 
-            if ($transaction)
+            if ($transaction){
                 return ResponseFormatter::success(
                     $transaction,
                     'Data transaksi berhasil diambil'
                 );
-            else
+	    }else{
                 return ResponseFormatter::error(
                     null,
                     'Data transaksi tidak ada',
                     404
                 );
+	    }
         }
 
         $transaction = Transaction::with(['items.menus'])->where('users_id', Auth::user()->id);
