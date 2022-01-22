@@ -69,4 +69,16 @@ class MenuCategoryController extends Controller
             return ResponseFormatter::error($e, 'Menu tidak ditemukan', 404);
         }
     }
+
+    public function delete(Request $request)
+    {
+        try {
+            $menuCategoryDelete =  MenuCategory::find($request->id)->delete();
+            DB::commit();
+            return ResponseFormatter::success($menuCategoryDelete, 'Data menu berhasil di delete');
+        } catch (Exception $e) {
+            DB::rollback();
+            return ResponseFormatter::error($e, 'Menu tidak ditemukan', 404);
+        }
+    }
 }
