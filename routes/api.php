@@ -35,4 +35,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('transaction', [TransactionController::class, 'all']);
     Route::post('checkout', [TransactionController::class, 'checkout']);
     Route::put('categories', [MenuCategoryController::class, 'update']);
+    Route::post('categories', [MenuCategoryController::class, 'store']);
 });

@@ -42,19 +42,31 @@ class MenuCategoryController extends Controller
         return ResponseFormatter::success($category->paginate($limit), 'Data List kategori berhasil diambil');
     }
 
+    public function store(Request $request)
+    {
+        $category = new MenuCategory();
+        $category->name = $request->name;
+
+        try {
+            $category->save();
+            return ResponseFormatter::success($category, 'Data kategori berhasil ditambahkan');
+        } catch (Exception $e) {
+            return ResponseFormatter::error(null, $e->getMessage(), 400);
+        }
+    }
+
     public function update(Request $request)
     {
 
-	//return ResponseFormatter::success($request->name, 'Data menu berhasil di update');
+        //return ResponseFormatter::success($request->name, 'Data menu berhasil di update');
 
-	try{
-           $menuCategoryUpdate =  MenuCategory::find($request->id)->update(['name' => $request->name]);
+        try {
+            $menuCategoryUpdate =  MenuCategory::find($request->id)->update(['name' => $request->name]);
             DB::commit();
-           return ResponseFormatter::success($menuCategoryUpdate, 'Data menu berhasil di update');
-	}catch(Exception $e){
-	    DB::rollback();
+            return ResponseFormatter::success($menuCategoryUpdate, 'Data menu berhasil di update');
+        } catch (Exception $e) {
+            DB::rollback();
             return ResponseFormatter::error($e, 'Menu tidak ditemukan', 404);
-	}
-
+        }
     }
 }
