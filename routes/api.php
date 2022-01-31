@@ -23,6 +23,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get('menus', [MenuController::class, 'all']);
+Route::get('transaction/queue', [TransactionController::class, 'transactionQueue']);
 Route::get('categories', [MenuCategoryController::class, 'all']);
 Route::post('register', [UserController::class, 'register']);
 Route::post('login', [UserController::class, 'login']);
