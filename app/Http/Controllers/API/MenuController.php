@@ -51,4 +51,17 @@ class MenuController extends Controller
 
         return ResponseFormatter::success($menus->paginate($limit), 'Data menu berhasil diambil');
     }
+
+    public function store()
+    {
+        $request = request()->all();
+
+        $menu = Menu::create($request);
+
+        if ($menu) {
+            return ResponseFormatter::success($menu, 'Menu berhasil ditambahkan');
+        } else {
+            return ResponseFormatter::error(null, 'Menu gagal ditambahkan', 500);
+        }
+    }
 }
