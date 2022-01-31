@@ -68,9 +68,7 @@ class MenuController extends Controller
        	}
 
 	}catch(Exception $e){
-		
-		return ResponseFormatter::error($e, 'Tambah Menu Gagal');
-
+	return ResponseFormatter::error($e, 'Tambah Menu Gagal');
 	}
 
     }
@@ -89,7 +87,7 @@ class MenuController extends Controller
             return ResponseFormatter::success($menu, 'Menu berhasil diubah');
         } else {
             return ResponseFormatter::error(null, 'Menu tidak ditemukan', 404);
-        }
+	}
     }
 
     public function delete()
@@ -106,6 +104,4 @@ class MenuController extends Controller
             return ResponseFormatter::error(null, 'Menu tidak ditemukan', 404);
         }
     }
-
-
 }
