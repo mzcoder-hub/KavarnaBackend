@@ -16,6 +16,7 @@ class Transaction extends Model
         'users_id',
         'seat_number',
         'total_price',
+	'invoice',
         'payment_method',
         'status',
     ];

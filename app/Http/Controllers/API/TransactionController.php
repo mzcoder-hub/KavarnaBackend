@@ -15,6 +15,8 @@ class TransactionController extends Controller
 {
     public function all(Request $request)
     {
+
+	try{
         $id = $request->transaction_id;
         $limit = $request->limit;
         $status = $request->status;
@@ -36,7 +38,7 @@ class TransactionController extends Controller
 	    }
         }
 
-        $transaction = Transaction::with(['items.menus'])->where('users_id', Auth::user()->id);
+        $transaction = Transaction::with(['items.menus']);
 
         if ($status)
             $transaction->where('status', $status);
@@ -45,12 +47,16 @@ class TransactionController extends Controller
             $transaction->paginate($limit),
             'Data list transaksi berhasil diambil'
         );
+	}catch(Exception $error){
+	return ResponseFormatter::error($error, 'Ambil Data Transaksi Gagal');
+	}
     }
 
     public function checkout(Request $request)
     {
         try {
             $request->validate([
+		'invoice'=> 'required',
                 'items' => 'required|array',
                 'seat_number' => 'required',
                 'items.*.id' => 'exists:menus,id',
@@ -60,7 +66,9 @@ class TransactionController extends Controller
             //        return ResponseFormatter::success($request->items,'Transaksi Berhasil');
             $transaction = Transaction::create([
                 'users_id' => Auth::user()->id,
+		'invoice'=> $request->invoice,
                 'seat_number' => $request->seat_number,
+		'payment_method' => $request->payment_method,
                 'total_price' => $request->total_price,
                 'status' => $request->status
             ]);
@@ -72,9 +80,8 @@ class TransactionController extends Controller
                     'menus_id' => $menu['id'],
                     'transactions_id' => $transaction->id,
                     'quantity' => $menu['quantity']
-                ]);
+             ]);
             }
-
             DB::commit();
             return ResponseFormatter::success($transaction, 'Transaksi berhasil');
         } catch (Exception $e) {

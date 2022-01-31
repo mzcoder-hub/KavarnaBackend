@@ -16,9 +16,10 @@ class CreateTransactionTable extends Migration
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('users_id');
+ 	    $table->string('invoice');
             $table->bigInteger('seat_number');
             $table->float('total_price')->default(0);
-            $table->string('payment_method')->default('tunai');
+            $table->string('payment_method')->default('TUNAI');
             $table->string('status')->default('PENDING');
             $table->softDeletes();
             $table->timestamps();
