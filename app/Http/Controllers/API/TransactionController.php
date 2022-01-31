@@ -52,6 +52,22 @@ class TransactionController extends Controller
         }
     }
 
+    public function changeStatus(Request $request)
+    {
+        try {
+            $transaction = Transaction::find($request->transaction_id);
+            $transaction->status = $request->status;
+            $transaction->save();
+
+            return ResponseFormatter::success(
+                $transaction,
+                'Status transaksi berhasil diubah'
+            );
+        } catch (Exception $error) {
+            return ResponseFormatter::error($error, 'Ubah Status Transaksi Gagal');
+        }
+    }
+
     public function checkout(Request $request)
     {
         try {
