@@ -55,22 +55,20 @@ class MenuController extends Controller
 
     public function store()
     {
-	try{
+        try {
 
-        $request = request()->all();
-	//print_r($request);
-        $menu = Menu::create($request);
+            $request = request()->all();
+            //print_r($request);
+            $menu = Menu::create($request);
 
-       	if ($menu) {
-         	return ResponseFormatter::success($menu, 'Menu berhasil ditambahkan');
-       	} else {
-       	        return ResponseFormatter::error(null, 'Menu gagal ditambahkan', 500);
-       	}
-
-	}catch(Exception $e){
-	return ResponseFormatter::error($e, 'Tambah Menu Gagal');
-	}
-
+            if ($menu) {
+                return ResponseFormatter::success($menu, 'Menu berhasil ditambahkan');
+            } else {
+                return ResponseFormatter::error(null, 'Menu gagal ditambahkan', 500);
+            }
+        } catch (Exception $e) {
+            return ResponseFormatter::error($e, 'Tambah Menu Gagal');
+        }
     }
 
     public function update()
@@ -87,7 +85,7 @@ class MenuController extends Controller
             return ResponseFormatter::success($menu, 'Menu berhasil diubah');
         } else {
             return ResponseFormatter::error(null, 'Menu tidak ditemukan', 404);
-	}
+        }
     }
 
     public function delete()

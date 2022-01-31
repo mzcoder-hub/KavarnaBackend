@@ -32,15 +32,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('user', [UserController::class, 'updateProfile']);
     Route::post('logout', [UserController::class, 'logout']);
 
-<<<<<<< HEAD
     Route::post('menus', [MenuController::class, 'store']);
     Route::put('menus', [MenuController::class, 'update']);
     Route::delete('menus', [MenuController::class, 'delete']);
-	
-=======
-    Route::post('menu', [MenuController::class, 'store']);
 
->>>>>>> 9d41355614dfefab21b6c0559729ee494d155cef
     Route::get('transaction', [TransactionController::class, 'all']);
     Route::post('checkout', [TransactionController::class, 'checkout']);
     Route::put('categories', [MenuCategoryController::class, 'update']);
