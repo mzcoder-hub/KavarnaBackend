@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;
 use App\Models\Menu;
+use Exception;
 use Illuminate\Http\Request;
 
 class MenuController extends Controller
@@ -51,4 +52,60 @@ class MenuController extends Controller
 
         return ResponseFormatter::success($menus->paginate($limit), 'Data menu berhasil diambil');
     }
+
+    public function store()
+    {
+	try{
+
+        $request = request()->all();
+	//print_r($request);
+        $menu = Menu::create($request);
+
+       	if ($menu) {
+         	return ResponseFormatter::success($menu, 'Menu berhasil ditambahkan');
+       	} else {
+       	        return ResponseFormatter::error(null, 'Menu gagal ditambahkan', 500);
+       	}
+
+	}catch(Exception $e){
+		
+		return ResponseFormatter::error($e, 'Tambah Menu Gagal');
+
+	}
+
+    }
+
+    public function update()
+    {
+        $request = request()->all();
+
+        $id = $request['id'];
+
+        $menu = Menu::find($id);
+
+        if ($menu) {
+            $menu->update($request);
+
+            return ResponseFormatter::success($menu, 'Menu berhasil diubah');
+        } else {
+            return ResponseFormatter::error(null, 'Menu tidak ditemukan', 404);
+        }
+    }
+
+    public function delete()
+    {
+        $request = request()->id;
+
+        $menu = Menu::find($request);
+
+        if ($menu) {
+            $menu->delete();
+
+            return ResponseFormatter::success(null, 'Menu berhasil dihapus');
+        } else {
+            return ResponseFormatter::error(null, 'Menu tidak ditemukan', 404);
+        }
+    }
+
+
 }
