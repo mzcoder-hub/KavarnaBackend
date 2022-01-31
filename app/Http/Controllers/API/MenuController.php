@@ -64,4 +64,19 @@ class MenuController extends Controller
             return ResponseFormatter::error(null, 'Menu gagal ditambahkan', 500);
         }
     }
+
+    public function delete()
+    {
+        $request = request()->id;
+
+        $menu = Menu::find($request);
+
+        if ($menu) {
+            $menu->delete();
+
+            return ResponseFormatter::success(null, 'Menu berhasil dihapus');
+        } else {
+            return ResponseFormatter::error(null, 'Menu tidak ditemukan', 404);
+        }
+    }
 }
