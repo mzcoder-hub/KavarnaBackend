@@ -110,6 +110,10 @@ class UserController extends Controller
     {
         $data = $request->all();
 
+        if ($data['password']) {
+            $data['password'] = Hash::make($data['password']);
+        }
+
         $user = Auth::user();
         $user->update($data);
 
