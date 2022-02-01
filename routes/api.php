@@ -27,6 +27,8 @@ Route::get('transaction/queue', [TransactionController::class, 'transactionQueue
 Route::get('categories', [MenuCategoryController::class, 'all']);
 Route::post('register', [UserController::class, 'register']);
 Route::post('login', [UserController::class, 'login']);
+Route::delete('user/delete', [UserController::class, 'delete']);
+Route::get('user/all', [UserController::class, 'fetchAll']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('user', [UserController::class, 'fetch']);

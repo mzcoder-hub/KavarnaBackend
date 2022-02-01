@@ -19,6 +19,12 @@ class UserController extends Controller
         return ResponseFormatter::success($request->user(), 'Data profile user berhasil diambil');
     }
 
+    public function fetchAll(Request $request)
+    {
+        $getDataUser = User::all();
+        return ResponseFormatter::success($getDataUser, 'Data profile user berhasil diambil');
+    }
+
     public function login(Request $request)
     {
         try {
@@ -61,7 +67,7 @@ class UserController extends Controller
                 'username' => ['required', 'string', 'max:255', 'unique:users'],
                 'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
                 'phone' => ['nullable', 'string', 'max:13', 'min:10'],
-		'roles' => ['required'],
+                'roles' => ['required'],
                 'password' => ['required', 'string', new Password],
             ]);
 
@@ -70,7 +76,7 @@ class UserController extends Controller
                 'username' => $request->username,
                 'email' => $request->email,
                 'phone' => $request->phone,
-		'roles' => $request->roles,
+                'roles' => $request->roles,
                 'password' => Hash::make($request->password),
             ]);
 
@@ -109,6 +115,17 @@ class UserController extends Controller
 
         return ResponseFormatter::success($user, 'Profile Updated');
     }
+
+    public function delete(Request $request)
+    {
+
+        $user = User::where('id', $request->id)->first();
+        $user->delete();
+
+        return ResponseFormatter::success('deleted', 'Profile Deleted');
+    }
+
+
     public function logout(Request $request)
     {
         $token = $request->user()->currentAccessToken()->delete();
