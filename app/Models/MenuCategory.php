@@ -16,4 +16,9 @@ class MenuCategory extends Model
     {
         return $this->hasMany(Menu::class, 'categories_id', 'id');
     }
+
+    public function galleries()
+    {
+        return $this->hasMany(CategoryGallery::class, 'categories_id', 'id');
+    }
 }

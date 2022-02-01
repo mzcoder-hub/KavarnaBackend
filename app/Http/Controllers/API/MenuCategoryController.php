@@ -5,9 +5,11 @@ namespace App\Http\Controllers\API;
 use Illuminate\Support\Facades\DB;
 use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;
+use App\Models\CategoryGallery;
 use App\Models\MenuCategory;
 use Illuminate\Http\Request;
 use Exception;
+use Illuminate\Support\Facades\Validator;
 
 class MenuCategoryController extends Controller
 {
@@ -19,7 +21,7 @@ class MenuCategoryController extends Controller
         $show_category = $request->input('show_category');
 
         if ($id) {
-            $category = MenuCategory::with(['menus'])->find($id);
+            $category = MenuCategory::with(['menus', 'galleries'])->find($id);
 
             if ($category) {
                 return ResponseFormatter::success($category, 'Data kategori berhasil diambil');
@@ -32,24 +34,45 @@ class MenuCategoryController extends Controller
 
 
         if ($name) {
-            $category->where('name', 'like', '%' . $name . '%');
+            $category->where('name', 'like', '%' . $name . '%')->with(['galleries']);
         }
 
         if ($show_category) {
-            $category->with('menus');
+            $category->with('menus', 'galleries');
         }
 
-        return ResponseFormatter::success($category->paginate($limit), 'Data List kategori berhasil diambil');
+        return ResponseFormatter::success($category->with(['galleries'])->paginate($limit), 'Data List kategori berhasil diambil');
     }
 
     public function store(Request $request)
     {
-        $category = new MenuCategory();
-        $category->name = $request->name;
-
         try {
-            $category->save();
-            return ResponseFormatter::success($category, 'Data kategori berhasil ditambahkan');
+            $category = new MenuCategory();
+            $category->name = $request->name;
+
+
+            $validatorImage = Validator::make($request->all(), [
+                'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            ]);
+
+            if ($validatorImage->fails()) {
+                ResponseFormatter::error($validatorImage->errors(), 'Data gambar tidak valid', 422);
+            } else {
+                $imageFolderPath = 'public/images/category';
+                $path = $request->file('image')->store($imageFolderPath);
+
+                if ($path) {
+                    $category->save();
+
+                    CategoryGallery::create([
+                        'categories_id' => $category->id,
+                        'url' => $path,
+                    ]);
+                    return ResponseFormatter::success($category, 'Data kategori berhasil ditambahkan');
+                } else {
+                    return ResponseFormatter::error(null, 'Gagal menyimpan gambar', 500);
+                }
+            }
         } catch (Exception $e) {
             return ResponseFormatter::error(null, $e->getMessage(), 400);
         }
@@ -62,11 +85,39 @@ class MenuCategoryController extends Controller
 
         try {
             $menuCategoryUpdate =  MenuCategory::find($request->id)->update(['name' => $request->name]);
-            DB::commit();
-            return ResponseFormatter::success($menuCategoryUpdate, 'Data menu berhasil di update');
+
+            if ($menuCategoryUpdate) {
+                $getCategoryGalleriesById = CategoryGallery::where('categories_id', $request->id)->first();
+                if (!$getCategoryGalleriesById) {
+                    $imageFolderPath = 'public/images/category';
+                    $path = $request->file('image')->store($imageFolderPath);
+                    if ($path) {
+                        CategoryGallery::create([
+                            'categories_id' => $request->id,
+                            'url' => $path,
+                        ]);
+                        return ResponseFormatter::success($menuCategoryUpdate, 'Menu berhasil diupdate');
+                    } else {
+                        return ResponseFormatter::error(null, 'Gambar tidak dapat diupload', 500);
+                    }
+                } else {
+                    $imageFolderPath = 'public/images/category';
+                    $path = $request->file('image')->store($imageFolderPath);
+
+                    if ($path) {
+                        $getCategoryGalleriesById->update([
+                            'url' => $path
+                        ]);
+                        DB::commit();
+                        return ResponseFormatter::success($menuCategoryUpdate, 'Data menu berhasil di update');
+                    } else {
+                        return ResponseFormatter::error(null, 'Gambar tidak dapat diupload', 500);
+                    }
+                }
+            }
         } catch (Exception $e) {
             DB::rollback();
-            return ResponseFormatter::error($e, 'Menu tidak ditemukan', 404);
+            return ResponseFormatter::error($e, 'Menu Category tidak ditemukan', 404);
         }
     }
 

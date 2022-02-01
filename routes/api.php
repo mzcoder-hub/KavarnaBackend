@@ -43,7 +43,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('transaction', [TransactionController::class, 'changeStatus']);
 
     Route::post('checkout', [TransactionController::class, 'checkout']);
-    Route::put('categories', [MenuCategoryController::class, 'update']);
+    Route::post('categories/update', [MenuCategoryController::class, 'update']);
     Route::post('categories', [MenuCategoryController::class, 'store']);
     Route::delete('categories/delete', [MenuCategoryController::class, 'delete']);
 });
