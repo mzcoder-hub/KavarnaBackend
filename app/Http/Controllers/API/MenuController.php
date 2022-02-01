@@ -94,13 +94,26 @@ class MenuController extends Controller
 
     public function update(Request $request)
     {
-        try {
-            $getMenuById = Menu::find($request->id);
-            $getMenuGalleriesById = MenuGallery::where('menus_id', $request->id)->first();
+        $getMenuById = Menu::find($request->id);
 
-            if ($getMenuById && $getMenuGalleriesById) {
-                $updateMenu = $getMenuById->update($request->all());
-                if ($updateMenu) {
+
+        if ($getMenuById) {
+            $updateMenu = $getMenuById->update($request->all());
+            if ($updateMenu) {
+                $getMenuGalleriesById = MenuGallery::where('menus_id', $request->id)->first();
+                if (!$getMenuGalleriesById) {
+                    $imageFolderPath = 'public/images';
+                    $path = $request->file('image')->store($imageFolderPath);
+                    if ($path) {
+                        MenuGallery::create([
+                            'menus_id' => $request->id,
+                            'url' => $path,
+                        ]);
+                        return ResponseFormatter::success($getMenuById, 'Menu berhasil diupdate');
+                    } else {
+                        return ResponseFormatter::error(null, 'Gambar tidak dapat diupload', 500);
+                    }
+                } else {
                     $imageFolderPath = 'public/images';
                     $path = $request->file('image')->store($imageFolderPath);
 
@@ -113,9 +126,9 @@ class MenuController extends Controller
                         return ResponseFormatter::error(null, 'Gambar tidak dapat diupload', 500);
                     }
                 }
+            } else {
+                return ResponseFormatter::error(null, 'Gambar tidak dapat diupload', 500);
             }
-        } catch (Exception $e) {
-            return ResponseFormatter::error($e, 'Update Menu Gagal');
         }
     }
 
