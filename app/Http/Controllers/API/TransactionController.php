@@ -164,6 +164,20 @@ class TransactionController extends Controller
                     );
                 }
             }
+            if ($request->typeRange == 'years') {
+
+                $transaction = Transaction::whereBetween('created_at', [Carbon::now()->startOfYear(), Carbon::now()->endOfYear()])->where('status', 'SUCCESS')->with(['items'])->get();
+
+                if ($transaction) {
+                    return ResponseFormatter::success($transaction, 'Data transaksi berhasil diambil');
+                } else {
+                    return ResponseFormatter::error(
+                        null,
+                        'Data transaksi tidak ada',
+                        404
+                    );
+                }
+            }
         } catch (Exception $error) {
             return ResponseFormatter::error($error, 'Ambil Data Transaksi Gagal');
         }
