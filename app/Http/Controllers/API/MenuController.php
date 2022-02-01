@@ -8,6 +8,7 @@ use App\Models\Menu;
 use App\Models\MenuGallery;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class MenuController extends Controller
@@ -62,30 +63,24 @@ class MenuController extends Controller
             $requested = request()->all();
             //print_r($request);
 
-            $validatorImage = Validator::make($requested, [
-                'ktp' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            ]);
+            $image = $request->image;  // your base64 encoded
+            $imageName = 'menu_' . time() . '.png';
+            $uploadImage = Storage::disk('public')->put($imageName, base64_decode($image));
+            $path = 'public/' . $imageName;
 
-            if ($validatorImage->fails()) {
-                ResponseFormatter::error($validatorImage->errors(), 'Data gambar tidak valid', 422);
-            } else {
-                $imageFolderPath = 'public/images';
-                $path = $request->file('image')->store($imageFolderPath);
-
-                if ($path) {
-                    $menu = Menu::create($requested);
-                    if ($menu) {
-                        MenuGallery::create([
-                            'menus_id' => $menu->id,
-                            'url' => $path,
-                        ]);
-                        return ResponseFormatter::success($menu, 'Menu berhasil ditambahkan');
-                    } else {
-                        return ResponseFormatter::error(null, 'Menu gagal ditambahkan', 500);
-                    }
+            if ($uploadImage) {
+                $menu = Menu::create($requested);
+                if ($menu) {
+                    MenuGallery::create([
+                        'menus_id' => $menu->id,
+                        'url' => $path,
+                    ]);
+                    return ResponseFormatter::success($menu, 'Menu berhasil ditambahkan');
                 } else {
-                    return ResponseFormatter::error(null, 'Gambar tidak dapat diupload', 500);
+                    return ResponseFormatter::error(null, 'Menu gagal ditambahkan', 500);
                 }
+            } else {
+                return ResponseFormatter::error(null, 'Gambar tidak dapat diupload', 500);
             }
         } catch (Exception $e) {
             return ResponseFormatter::error($e, 'Tambah Menu Gagal');
@@ -96,15 +91,19 @@ class MenuController extends Controller
     {
         $getMenuById = Menu::find($request->id);
 
+        // 'public/' . $imageName
+
 
         if ($getMenuById) {
             $updateMenu = $getMenuById->update($request->all());
             if ($updateMenu) {
                 $getMenuGalleriesById = MenuGallery::where('menus_id', $request->id)->first();
                 if (!$getMenuGalleriesById) {
-                    $imageFolderPath = 'public/images';
-                    $path = $request->file('image')->store($imageFolderPath);
-                    if ($path) {
+                    $image = $request->image;  // your base64 encoded
+                    $imageName = 'menu_' . time() . '.png';
+                    $uploadImage = Storage::disk('public')->put($imageName, base64_decode($image));
+                    $path = 'public/' . $imageName;
+                    if ($uploadImage) {
                         MenuGallery::create([
                             'menus_id' => $request->id,
                             'url' => $path,
@@ -114,9 +113,10 @@ class MenuController extends Controller
                         return ResponseFormatter::error(null, 'Gambar tidak dapat diupload', 500);
                     }
                 } else {
-                    $imageFolderPath = 'public/images';
-                    $path = $request->file('image')->store($imageFolderPath);
-
+                    $image = $request->image;  // your base64 encoded
+                    $imageName = 'menu_' . time() . '.png';
+                    $uploadImage = Storage::disk('public')->put($imageName, base64_decode($image));
+                    $path = 'public/' . $imageName;
                     if ($path) {
                         $getMenuGalleriesById->update([
                             'url' => $path
