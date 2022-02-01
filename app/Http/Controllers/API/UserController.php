@@ -113,7 +113,7 @@ class UserController extends Controller
 
         $user = User::find($id);
 
-        if ($request['password']) {
+        if ($request['password'] != null) {
 
             $request['password'] = Hash::make($request['password']);
 
@@ -124,6 +124,8 @@ class UserController extends Controller
 
             return ResponseFormatter::success($user, 'Profile Updated');
         } else {
+            unset($request['password']);
+
             $user->fill($request);
 
             $user->save();
