@@ -36,7 +36,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('logout', [UserController::class, 'logout']);
 
     Route::post('menus', [MenuController::class, 'store']);
-    Route::put('menus', [MenuController::class, 'update']);
+    Route::post('menus', [MenuController::class, 'update']);
     Route::delete('menus', [MenuController::class, 'delete']);
 
     Route::get('transaction', [TransactionController::class, 'all']);
