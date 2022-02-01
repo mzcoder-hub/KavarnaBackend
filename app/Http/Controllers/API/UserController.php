@@ -108,16 +108,28 @@ class UserController extends Controller
 
     public function updateProfile(Request $request)
     {
-        $data = $request->all();
+        $id = $request->id;
+        $request = $request->all();
 
-        if ($data['password']) {
-            $data['password'] = Hash::make($data['password']);
+        $user = User::find($id);
+
+        if ($request['password']) {
+
+            $request['password'] = Hash::make($request['password']);
+
+
+            $user->fill($request);
+
+            $user->save();
+
+            return ResponseFormatter::success($user, 'Profile Updated');
+        } else {
+            $user->fill($request);
+
+            $user->save();
+
+            return ResponseFormatter::success($user, 'Profile Updated');
         }
-
-        $user = Auth::user();
-        $user->update($data);
-
-        return ResponseFormatter::success($user, 'Profile Updated');
     }
 
     public function delete(Request $request)
