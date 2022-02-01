@@ -40,7 +40,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('menus', [MenuController::class, 'delete']);
 
     Route::get('transaction', [TransactionController::class, 'all']);
-    Route::put('transaction', [TransactionController::class, 'changeStatus']);
+    Route::post('transaction/change', [TransactionController::class, 'changeStatus']);
+
+    Route::get('transaction/range', [TransactionController::class, 'transactionRange']);
 
     Route::post('checkout', [TransactionController::class, 'checkout']);
     Route::post('categories/update', [MenuCategoryController::class, 'update']);

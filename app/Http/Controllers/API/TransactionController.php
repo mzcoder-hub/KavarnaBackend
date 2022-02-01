@@ -7,6 +7,7 @@ use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;
 use App\Models\Transaction;
 use App\Models\TransactionItem;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -56,6 +57,7 @@ class TransactionController extends Controller
     {
         try {
             $transaction = Transaction::find($request->transaction_id);
+            // print_r($request->all());
             $transaction->status = $request->status;
             $transaction->save();
 
@@ -121,6 +123,49 @@ class TransactionController extends Controller
             return ResponseFormatter::success(1, 'Nomor Antrian Baru dibuat', 404);
         } catch (Exception $error) {
             return ResponseFormatter::error($error, 'Ambil Nomor Antrian Gagal');
+        }
+    }
+
+    public function transactionRange(Request $request)
+    {
+
+        try {
+            $request->validate([
+                'typeRange' => 'required',
+            ]);
+
+            // print_r($request->typeRange);
+
+            if ($request->typeRange == 'today') {
+                $transaction = Transaction::where('status', '=', 'SUCCESS')->where('created_at', ">=", Carbon::today())->with(['items'])->get();
+
+                if ($transaction) {
+                    return ResponseFormatter::success($transaction, 'Data transaksi berhasil diambil');
+                } else {
+                    return ResponseFormatter::error(
+                        null,
+                        'Data transaksi tidak ada',
+                        404
+                    );
+                }
+            }
+
+            if ($request->typeRange == 'weeks') {
+
+                $transaction = Transaction::whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->where('status', 'SUCCESS')->with(['items'])->get();
+
+                if ($transaction) {
+                    return ResponseFormatter::success($transaction, 'Data transaksi berhasil diambil');
+                } else {
+                    return ResponseFormatter::error(
+                        null,
+                        'Data transaksi tidak ada',
+                        404
+                    );
+                }
+            }
+        } catch (Exception $error) {
+            return ResponseFormatter::error($error, 'Ambil Data Transaksi Gagal');
         }
     }
 }
