@@ -137,7 +137,7 @@ class TransactionController extends Controller
             // print_r($request->typeRange);
 
             if ($request->typeRange == 'today') {
-                $transaction = Transaction::where('status', '=', 'SUCCESS')->where('created_at', ">=", Carbon::today())->with(['items'])->get();
+                $transaction = Transaction::where('status', '=', 'SUCCESS')->where('created_at', ">=", Carbon::today())->with(['items.menus'])->get();
 
                 if ($transaction) {
                     return ResponseFormatter::success($transaction, 'Data transaksi berhasil diambil');
@@ -152,7 +152,7 @@ class TransactionController extends Controller
 
             if ($request->typeRange == 'weeks') {
 
-                $transaction = Transaction::whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->where('status', 'SUCCESS')->with(['items'])->get();
+                $transaction = Transaction::whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->where('status', 'SUCCESS')->with(['items.menus'])->get();
 
                 if ($transaction) {
                     return ResponseFormatter::success($transaction, 'Data transaksi berhasil diambil');
@@ -166,7 +166,7 @@ class TransactionController extends Controller
             }
             if ($request->typeRange == 'years') {
 
-                $transaction = Transaction::whereBetween('created_at', [Carbon::now()->startOfYear(), Carbon::now()->endOfYear()])->where('status', 'SUCCESS')->with(['items'])->get();
+                $transaction = Transaction::whereBetween('created_at', [Carbon::now()->startOfYear(), Carbon::now()->endOfYear()])->where('status', 'SUCCESS')->with(['items.menus'])->get();
 
                 if ($transaction) {
                     return ResponseFormatter::success($transaction, 'Data transaksi berhasil diambil');

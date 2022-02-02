@@ -19,6 +19,6 @@ class TransactionItem extends Model
 
     public function menus()
     {
-        return $this->hasOne(Menu::class, 'id', 'menus_id');
+        return $this->hasMany(Menu::class, 'id', 'menus_id');
     }
 }
