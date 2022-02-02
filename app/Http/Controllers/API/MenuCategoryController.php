@@ -9,6 +9,7 @@ use App\Models\CategoryGallery;
 use App\Models\MenuCategory;
 use Illuminate\Http\Request;
 use Exception;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class MenuCategoryController extends Controller
@@ -49,18 +50,11 @@ class MenuCategoryController extends Controller
         try {
             $category = new MenuCategory();
             $category->name = $request->name;
-
-
-            $validatorImage = Validator::make($request->all(), [
-                'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            ]);
-
-            if ($validatorImage->fails()) {
-                ResponseFormatter::error($validatorImage->errors(), 'Data gambar tidak valid', 422);
-            } else {
-                $imageFolderPath = 'public/images/category';
-                $path = $request->file('image')->store($imageFolderPath);
-
+            $image = $request->image;  // your base64 encoded
+            $imageName = 'menu_' . time() . '.png';
+            $uploadImage = Storage::disk('public')->put($imageName, base64_decode($image));
+            $path = 'public/' . $imageName;
+            if ($uploadImage) {
                 if ($path) {
                     $category->save();
 
@@ -72,6 +66,8 @@ class MenuCategoryController extends Controller
                 } else {
                     return ResponseFormatter::error(null, 'Gagal menyimpan gambar', 500);
                 }
+            } else {
+                return ResponseFormatter::error(null, 'Gagal menyimpan gambar', 500);
             }
         } catch (Exception $e) {
             return ResponseFormatter::error(null, $e->getMessage(), 400);
@@ -89,16 +85,22 @@ class MenuCategoryController extends Controller
             if ($menuCategoryUpdate) {
                 $getCategoryGalleriesById = CategoryGallery::where('categories_id', $request->id)->first();
                 if (!$getCategoryGalleriesById) {
-                    $imageFolderPath = 'public/images/category';
-                    $path = $request->file('image')->store($imageFolderPath);
-                    if ($path) {
-                        CategoryGallery::create([
-                            'categories_id' => $request->id,
-                            'url' => $path,
-                        ]);
-                        return ResponseFormatter::success($menuCategoryUpdate, 'Menu berhasil diupdate');
+                    $image = $request->image;  // your base64 encoded
+                    $imageName = 'menu_' . time() . '.png';
+                    $uploadImage = Storage::disk('public')->put($imageName, base64_decode($image));
+                    $path = 'public/' . $imageName;
+                    if ($uploadImage) {
+                        if ($path) {
+                            CategoryGallery::create([
+                                'categories_id' => $request->id,
+                                'url' => $path,
+                            ]);
+                            return ResponseFormatter::success($menuCategoryUpdate, 'Menu berhasil diupdate');
+                        } else {
+                            return ResponseFormatter::error(null, 'Gambar tidak dapat diupload', 500);
+                        }
                     } else {
-                        return ResponseFormatter::error(null, 'Gambar tidak dapat diupload', 500);
+                        return ResponseFormatter::error(null, 'Gagal menyimpan gambar', 500);
                     }
                 } else {
                     $imageFolderPath = 'public/images/category';
