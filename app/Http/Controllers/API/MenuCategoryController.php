@@ -22,7 +22,7 @@ class MenuCategoryController extends Controller
         $show_category = $request->input('show_category');
 
         if ($id) {
-            $category = MenuCategory::with(['menus', 'galleries'])->find($id);
+            $category = MenuCategory::with(['menus.galleries', 'galleries'])->find($id);
 
             if ($category) {
                 return ResponseFormatter::success($category, 'Data kategori berhasil diambil');
@@ -35,14 +35,14 @@ class MenuCategoryController extends Controller
 
 
         if ($name) {
-            $category->where('name', 'like', '%' . $name . '%')->with(['galleries']);
+            $category->where('name', 'like', '%' . $name . '%')->with(['galleries', 'menus.galleries']);
         }
 
         if ($show_category) {
-            $category->with('menus', 'galleries');
+            $category->with('menus.galleries', 'galleries');
         }
 
-        return ResponseFormatter::success($category->with(['galleries'])->paginate($limit), 'Data List kategori berhasil diambil');
+        return ResponseFormatter::success($category->with(['menus.galleries','galleries'])->paginate($limit), 'Data List kategori berhasil diambil');
     }
 
     public function store(Request $request)
@@ -54,6 +54,8 @@ class MenuCategoryController extends Controller
             $imageName = 'menu_' . time() . '.png';
             $uploadImage = Storage::disk('public')->put($imageName, base64_decode($image));
             $path = 'public/' . $imageName;
+
+
             if ($uploadImage) {
                 if ($path) {
                     $category->save();
@@ -85,6 +87,7 @@ class MenuCategoryController extends Controller
             if ($menuCategoryUpdate) {
                 $getCategoryGalleriesById = CategoryGallery::where('categories_id', $request->id)->first();
                 if (!$getCategoryGalleriesById) {
+
                     $image = $request->image;  // your base64 encoded
                     $imageName = 'menu_' . time() . '.png';
                     $uploadImage = Storage::disk('public')->put($imageName, base64_decode($image));

@@ -24,6 +24,6 @@ class Menu extends Model
 
     public function galleries()
     {
-        return $this->hasMany(MenuGallery::class, 'menus_id', 'id');
+        return $this->hasOne(MenuGallery::class, 'menus_id', 'id');
     }
 }

@@ -18,6 +18,6 @@ class MenuGallery extends Model
 
     public function getUrlAttribute($url)
     {
-        return Storage::url($url);
+        return config('app.url') .Storage::url($url);
     }
 }
