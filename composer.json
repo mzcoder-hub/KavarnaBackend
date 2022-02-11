@@ -12,6 +12,7 @@
         "laravel/jetstream": "^2.4",
         "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.5",
+        "laraveldaily/laravel-invoices": "^2.0",
         "livewire/livewire": "^2.5",
         "yajra/laravel-datatables-oracle": "~9.0"
     },

@@ -31,4 +31,9 @@ class Transaction extends Model
     {
         return $this->hasMany(TransactionItem::class, 'transactions_id', 'id');
     }
+
+    public function buyers()
+    {
+        return $this->hasOne(Buyers::class, 'transactions_id', 'id');
+    }
 }
