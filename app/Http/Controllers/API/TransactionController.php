@@ -83,6 +83,8 @@ class TransactionController extends Controller
             $request->validate([
                 'invoice' => 'required',
                 'items' => 'required|array',
+                'name' => 'required',
+                'phone_number' => 'required',
                 'seat_number' => 'required',
                 'queue' => 'required',
                 'items.*.id' => 'exists:menus,id',
