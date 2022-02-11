@@ -4,17 +4,17 @@ namespace App\Http\Controllers\API;
 
 use Illuminate\Support\Facades\DB;
 use App\Helpers\ResponseFormatter;
+use App\Helpers\GeneratedPDF;
 use App\Http\Controllers\Controller;
 use App\Models\Buyers;
+use App\Models\InvoicesAttachment;
 use App\Models\Transaction;
 use App\Models\TransactionItem;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use LaravelDaily\Invoices\Classes\InvoiceItem;
-use LaravelDaily\Invoices\Classes\Party;
-use LaravelDaily\Invoices\Facades\Invoice;
+
 
 class TransactionController extends Controller
 {
@@ -27,9 +27,10 @@ class TransactionController extends Controller
             $status = $request->status;
 
             if ($id) {
-                $transaction = Transaction::with(['items.menus.galleries'])->find($id);
+                $transaction = Transaction::with(['items.menus.galleries', 'buyers', 'invoice_attachment'])->find($id);
 
                 if ($transaction) {
+                    $transaction->pdf = GeneratedPDF::letGeneratePDF($transaction);
                     return ResponseFormatter::success(
                         $transaction,
                         'Data transaksi berhasil diambil'
@@ -43,17 +44,19 @@ class TransactionController extends Controller
                 }
             }
 
-            $transaction = Transaction::with(['items.menus.galleries']);
+            $transaction = Transaction::with(['items.menus.galleries', 'buyers', 'invoice_attachment']);
 
-            if ($status)
+            if ($status) {
                 $transaction->where('status', $status);
+            }
 
             return ResponseFormatter::success(
                 $transaction->paginate($limit),
                 'Data list transaksi berhasil diambil'
             );
         } catch (Exception $error) {
-            return ResponseFormatter::error($error, 'Ambil Data Transaksi Gagal');
+            return $error;
+            // return ResponseFormatter::error($error, 'Ambil Data Transaksi Gagal');
         }
     }
 
@@ -86,7 +89,7 @@ class TransactionController extends Controller
                 'total_price' => 'required',
                 'status' => 'required',
             ]);
-            //        return ResponseFormatter::success($request->items,'Transaksi Berhasil');
+
             $transaction = Transaction::create([
                 'users_id' => Auth::user()->id,
                 'invoice' => $request->invoice,
@@ -97,14 +100,6 @@ class TransactionController extends Controller
                 'status' => $request->status
             ]);
 
-            $addToCustTable = Buyers::create([
-                'transactions_id' => $transaction->id,
-                'name' => $request->name_customer,
-                'phone_number' => $request->phone_customer,
-            ]);
-
-            //        return ResponseFormatter::success($transaction->id, 'Transaction Success');
-
             foreach ($request->items as $menu) {
                 TransactionItem::create([
                     'menus_id' => $menu['id'],
@@ -113,68 +108,23 @@ class TransactionController extends Controller
                 ]);
             }
 
-            $client = new Party([
-                'name'          => 'Sewidji Cafe & Resto',
-                'custom_fields' => [
-                    'alamat'        => 'Jl. Raya Pekajangan No.135, Gendingan, Pekajangan, Kec. Kedungwuni, Kabupaten Pekalongan, Jawa Tengah 51173',
-                ],
-            ]);
-
-            $customer = new Party([
-                'name'          => $transaction->buyers->name,
-                'custom_fields' => [
-                    'Nomor HP' => $transaction->buyers->phone_number,
-                ],
+            $addToCustTable = Buyers::create([
+                'transactions_id' => $transaction->id,
+                'name' => $request->name_customer,
+                'phone_number' => $request->phone_customer,
             ]);
 
 
-            $items = [];
+            $addToAttchTable = InvoicesAttachment::create([
+                'transactions_id' => $transaction->id,
+                'url' => GeneratedPDF::letGeneratePDF($transaction)
+            ]);
 
-            foreach ($transaction->items as $data) {
-                $items[] = (new InvoiceItem())
-                    ->title($data->menus[0]->name)
-                    ->pricePerUnit($data->menus[0]->price)
-                    ->quantity($data->quantity);
-            }
-
-            // $notes = [
-            //     'your multiline',
-            //     'additional notes',
-            //     'in regards of delivery or something else',
-            // ];
-            // $notes = implode("<br>", $notes);
-
-            $invoice = Invoice::make('receipt')
-                // ability to include translated invoice status
-                // in case it was paid
-                ->status(__('invoices::invoice.paid'))
-                ->sequence(667)
-                ->serialNumberFormat('{SEQUENCE}')
-                ->seller($client)
-                ->buyer($customer)
-                ->date(now()->subWeeks(3))
-                ->dateFormat('m/d/Y')
-                ->currencySymbol('Rp.')
-                ->currencyCode('Rupiah')
-                ->currencyFormat('{SYMBOL}{VALUE}')
-                ->currencyThousandsSeparator('.')
-                ->currencyDecimalPoint(',')
-                ->filename($transaction->invoice)
-                ->addItems($items)
-                // ->notes($notes)
-                // ->logo(public_path('vendor/invoices/sample-logo.png'))
-                // You can additionally save generated invoice to configured disk
-                ->save('public');
-
-            $link = $invoice->url();
-            // Then send email to party with link
-
-            // And return invoice itself to browser or have a different view
-            $transaction->pdf = $link;
             DB::commit();
             return ResponseFormatter::success($transaction, 'Transaksi berhasil');
         } catch (Exception $e) {
             DB::rollback();
+            // return $e;
             return ResponseFormatter::error($e, 'Transaksi Gagal');
         }
     }

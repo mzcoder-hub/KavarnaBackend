@@ -5,16 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Buyers extends Model
+class InvoicesAttachment extends Model
 {
     use HasFactory;
 
-    protected $table = 'buyers';
+    protected $table = 'invoices_attachment';
 
     protected $fillable = [
         'transactions_id',
-        'name',
-        'phone_number',
+        'url',
     ];
 
     public function transactions()
