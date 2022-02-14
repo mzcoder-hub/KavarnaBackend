@@ -83,8 +83,8 @@ class TransactionController extends Controller
             $request->validate([
                 'invoice' => 'required',
                 'items' => 'required|array',
-                'name' => 'required',
-                'phone_number' => 'required',
+                'name_customer' => 'required',
+                'phone_customer' => 'required',
                 'seat_number' => 'required',
                 'queue' => 'required',
                 'items.*.id' => 'exists:menus,id',
@@ -126,7 +126,7 @@ class TransactionController extends Controller
             return ResponseFormatter::success($transaction, 'Transaksi berhasil');
         } catch (Exception $e) {
             DB::rollback();
-            // return $e;
+            //return $e;
             return ResponseFormatter::error($e, 'Transaksi Gagal');
         }
     }
