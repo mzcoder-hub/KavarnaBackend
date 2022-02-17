@@ -54,7 +54,6 @@ class GeneratedPDF
             ->date(now()->subWeeks(3))
             ->dateFormat('m/d/Y')
             ->currencySymbol('Rp.')
-            ->currencyCode('Rupiah')
             ->currencyFormat('{SYMBOL}{VALUE}')
             ->currencyThousandsSeparator('.')
             ->currencyDecimalPoint(',')
