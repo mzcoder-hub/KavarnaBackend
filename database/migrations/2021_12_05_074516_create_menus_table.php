@@ -19,6 +19,7 @@ class CreateMenusTable extends Migration
             $table->float('price');
             $table->longText('description');
             $table->bigInteger('categories_id');
+            $table->boolean('status')->default(true);
             $table->softDeletes();
             $table->timestamps();
         });

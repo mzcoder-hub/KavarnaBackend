@@ -15,6 +15,7 @@ class Menu extends Model
         'description',
         'price',
         'categories_id',
+        'status',
     ];
 
     public function categories()
