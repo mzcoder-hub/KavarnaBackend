@@ -61,7 +61,6 @@ class MenuController extends Controller
         try {
 
             $requested = request()->all();
-            //print_r($request);
 
             $image = $request->image;  // your base64 encoded
             $imageName = 'menu_' . time() . '.png';
@@ -90,9 +89,6 @@ class MenuController extends Controller
     public function update(Request $request)
     {
         $getMenuById = Menu::find($request->id);
-
-        // 'public/' . $imageName
-
 
         if ($getMenuById) {
             $updateMenu = $getMenuById->update($request->all());

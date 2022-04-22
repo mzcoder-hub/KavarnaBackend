@@ -64,7 +64,6 @@ class TransactionController extends Controller
     {
         try {
             $transaction = Transaction::find($request->transaction_id);
-            // print_r($request->all());
             $transaction->status = $request->status;
             $transaction->save();
 
@@ -126,8 +125,7 @@ class TransactionController extends Controller
             return ResponseFormatter::success($transaction, 'Transaksi berhasil');
         } catch (Exception $e) {
             DB::rollback();
-            return $e;
-            //return ResponseFormatter::error($e, 'Transaksi Gagal');
+            return ResponseFormatter::error($e, 'Transaksi Gagal');
         }
     }
 
@@ -135,7 +133,6 @@ class TransactionController extends Controller
     {
         try {
             $transaction = Transaction::orderBy('created_at', 'desc')->first();
-            // print_r($transaction);
             if ($transaction) {
                 $newNumberQueue = $transaction->queue + 1;
                 return ResponseFormatter::success($newNumberQueue, 'Nomor Antrian didapatkan', 200);
@@ -154,8 +151,6 @@ class TransactionController extends Controller
             $request->validate([
                 'typeRange' => 'required',
             ]);
-
-            // print_r($request->typeRange);
 
             if ($request->typeRange == 'today') {
                 $transaction = Transaction::where('status', '=', 'SUCCESS')->where('created_at', ">=", Carbon::today())->with(['items.menus'])->get();

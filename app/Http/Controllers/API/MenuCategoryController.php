@@ -42,7 +42,7 @@ class MenuCategoryController extends Controller
             $category->with('menus.galleries', 'galleries');
         }
 
-        return ResponseFormatter::success($category->with(['menus.galleries','galleries'])->paginate($limit), 'Data List kategori berhasil diambil');
+        return ResponseFormatter::success($category->with(['menus.galleries', 'galleries'])->paginate($limit), 'Data List kategori berhasil diambil');
     }
 
     public function store(Request $request)
@@ -78,8 +78,6 @@ class MenuCategoryController extends Controller
 
     public function update(Request $request)
     {
-
-        //return ResponseFormatter::success($request->name, 'Data menu berhasil di update');
 
         try {
             $menuCategoryUpdate =  MenuCategory::find($request->id)->update(['name' => $request->name]);

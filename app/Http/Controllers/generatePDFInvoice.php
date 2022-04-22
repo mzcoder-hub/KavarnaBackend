@@ -15,10 +15,6 @@ class generatePDFInvoice extends Controller
         $getTransactionById = Transaction::with(['items.menus'])->find($request->id);
         if ($getTransactionById) {
 
-            // return response()->json([
-            //     'status' => 'success',
-            //     'data' => $getTransactionById->items,
-            // ]);
             $client = new Party([
                 'name'          => 'Sewidji Cafe & Resto',
                 'custom_fields' => [
@@ -45,16 +41,7 @@ class generatePDFInvoice extends Controller
                     ->quantity($data->quantity);
             }
 
-            // $notes = [
-            //     'your multiline',
-            //     'additional notes',
-            //     'in regards of delivery or something else',
-            // ];
-            // $notes = implode("<br>", $notes);
-
             $invoice = Invoice::make('receipt')
-                // ability to include translated invoice status
-                // in case it was paid
                 ->status(__('invoices::invoice.paid'))
                 ->sequence(667)
                 ->serialNumberFormat('{SEQUENCE}')
@@ -69,15 +56,10 @@ class generatePDFInvoice extends Controller
                 ->currencyDecimalPoint(',')
                 ->filename($client->name . ' ' . $customer->name)
                 ->addItems($items)
-                // ->notes($notes)
-                // ->logo(public_path('vendor/invoices/sample-logo.png'))
-                // You can additionally save generated invoice to configured disk
                 ->save('public');
 
             $link = $invoice->url();
-            // Then send email to party with link
 
-            // And return invoice itself to browser or have a different view
             return $invoice->stream();
         } else {
             $client = new Party([
@@ -115,8 +97,6 @@ class generatePDFInvoice extends Controller
             $notes = implode("<br>", $notes);
 
             $invoice = Invoice::make('receipt')
-                // ability to include translated invoice status
-                // in case it was paid
                 ->status(__('invoices::invoice.paid'))
                 ->sequence(667)
                 ->serialNumberFormat('{SEQUENCE}')
@@ -133,13 +113,10 @@ class generatePDFInvoice extends Controller
                 ->addItems($items)
                 ->notes($notes)
                 ->logo(public_path('vendor/invoices/sample-logo.png'))
-                // You can additionally save generated invoice to configured disk
                 ->save('public');
 
             $link = $invoice->url();
-            // Then send email to party with link
 
-            // And return invoice itself to browser or have a different view
             return $invoice->stream();
         }
     }
