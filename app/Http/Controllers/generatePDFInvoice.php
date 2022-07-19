@@ -56,7 +56,7 @@ class generatePDFInvoice extends Controller
                 ->currencyDecimalPoint(',')
                 ->filename($client->name . ' ' . $customer->name)
                 ->addItems($items)
-                ->save('public');
+                ->save('local');
 
             $link = $invoice->url();
 
@@ -113,7 +113,7 @@ class generatePDFInvoice extends Controller
                 ->addItems($items)
                 ->notes($notes)
                 ->logo(public_path('vendor/invoices/sample-logo.png'))
-                ->save('public');
+                ->save('local');
 
             $link = $invoice->url();
 

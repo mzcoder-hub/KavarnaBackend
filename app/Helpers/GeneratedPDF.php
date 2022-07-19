@@ -12,9 +12,9 @@ class GeneratedPDF
     {
 
         $client = new Party([
-            'name' => 'Sewidji Cafe & Resto',
+            'name' => 'Ngabangan 1907 Coffee Bar',
             'custom_fields' => [
-                'alamat' => 'Jl. Raya Pekajangan No.135, Gendingan, Pekajangan, Kec. Kedungwuni, Kabupaten Pekalongan, Jawa Tengah 51173',
+                'alamat' => 'Jl. Surabaya Sugihwaras Gg. 5A No.3, Sugihwaras, Kec. Pekalongan Tim., Kota Pekalongan, Jawa Tengah 51129',
             ],
         ]);
 
@@ -29,46 +29,34 @@ class GeneratedPDF
 
         foreach ($transaction->items as $data) {
             $items[] = (new InvoiceItem())
-                ->title($data->menus[0]->name)
-                ->pricePerUnit($data->menus[0]->price)
+                ->title($data->menus[0]->title)
+                ->pricePerUnit($data->menus[0]->price_per_unit)
                 ->quantity($data->quantity);
         }
 
+        $data = [
+            "items" => $transaction->items,
+        ];
 
+        // $invoice = Invoice::make('receipt')
+        //     ->status(__('invoices::invoice.paid'))
+        //     ->sequence(667)
+        //     ->serialNumberFormat('{SEQUENCE}')
+        //     ->seller($client)
+        //     ->buyer($customer)
+        //     ->date(now()->subWeeks(3))
+        //     ->dateFormat('m/d/Y')
+        //     ->currencySymbol('Rp.')
+        //     ->currencyFormat('{SYMBOL}{VALUE}')
+        //     ->currencyThousandsSeparator('.')
+        //     ->currencyDecimalPoint(',')
+        //     ->filename($transaction->invoice)
+        //     ->addItems($items)
+        //     ->save('public');
 
-        // // $notes = [
-        // // 'your multiline',
-        // // 'additional notes',
-        // // 'in regards of delivery or something else',
-        // // ];
-        // // $notes = implode("<br>", $notes);
+        // $link = $invoice->url();
 
-        $invoice = Invoice::make('receipt')
-            // ability to include translated invoice status
-            // in case it was paid
-            ->status(__('invoices::invoice.paid'))
-            ->sequence(667)
-            ->serialNumberFormat('{SEQUENCE}')
-            ->seller($client)
-            ->buyer($customer)
-            ->date(now()->subWeeks(3))
-            ->dateFormat('m/d/Y')
-            ->currencySymbol('Rp.')
-            ->currencyFormat('{SYMBOL}{VALUE}')
-            ->currencyThousandsSeparator('.')
-            ->currencyDecimalPoint(',')
-            ->filename($transaction->invoice)
-            ->addItems($items)
-            ->save('public')
-            // // ->notes($notes)
-            ->logo(public_path('vendor/invoices/sample-logo.png'));
-        // // You can additionally save generated invoice to configured disk
-
-        $link = $invoice->url();
-        // // Then send email to party with link
-
-        // // And return invoice itself to browser or have a different view
-        return $link;
+        return $data;
     }
 
     public function letGeneratePDFAndSave($transaction)
@@ -97,16 +85,8 @@ class GeneratedPDF
                 ->quantity($data->quantity);
         }
 
-        // $notes = [
-        // 'your multiline',
-        // 'additional notes',
-        // 'in regards of delivery or something else',
-        // ];
-        // $notes = implode("<br>", $notes);
 
         $invoice = Invoice::make('receipt')
-            // ability to include translated invoice status
-            // in case it was paid
             ->status(__('invoices::invoice.paid'))
             ->sequence(667)
             ->serialNumberFormat('{SEQUENCE}')
@@ -121,9 +101,6 @@ class GeneratedPDF
             ->currencyDecimalPoint(',')
             ->filename($transaction->invoice)
             ->addItems($items)
-            // ->notes($notes)
-            // ->logo(public_path('vendor/invoices/sample-logo.png'))
-            // You can additionally save generated invoice to configured disk
             ->save('public');
 
         $link = $invoice->url();

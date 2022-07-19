@@ -78,7 +78,7 @@ class TransactionController extends Controller
 
     public function checkout(Request $request)
     {
-        try {
+
             $request->validate([
                 'invoice' => 'required',
                 'items' => 'required|array',
@@ -115,18 +115,20 @@ class TransactionController extends Controller
                 'phone_number' => $request->phone_customer,
             ]);
 
+	     $dataToAttach = Transaction::with(['items.menus', 'buyers'])->find($transaction->id);
 
-            $addToAttchTable = InvoicesAttachment::create([
-                'transactions_id' => $transaction->id,
-                'url' => GeneratedPDF::letGeneratePDF($transaction)
-            ]);
+            //$addToAttchTable = InvoicesAttachment::create([
+            //    'transactions_id' => $transaction->id,
+            //    'url' => GeneratedPDF::letGeneratePDF($transaction)
+            //]);
+
+            //$data = [
+            //  'invoice_attachment' => GeneratedPDF::letGeneratePDF($dataToAttach)
+            //];
 
             DB::commit();
-            return ResponseFormatter::success($transaction, 'Transaksi berhasil');
-        } catch (Exception $e) {
-            DB::rollback();
-            return ResponseFormatter::error($e, 'Transaksi Gagal');
-        }
+            return ResponseFormatter::success($dataToAttach, 'Transaksi berhasil');
+
     }
 
     public function transactionQueue()
